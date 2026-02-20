@@ -68,6 +68,12 @@ export default function Home() {
     if (res.ok) { setMembers(p => p.filter(m => m.id !== id)); toast('Member removed'); }
   };
 
+  const updateMember = async (id: string, data: Partial<Member>) => {
+    const res = await fetch(`/api/members/${id}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
+    if (res.ok) { const updated = await res.json(); setMembers(p => p.map(m => m.id === id ? updated : m)); toast('Member updated'); }
+    else toast('Failed to update member', 'error');
+  };
+
   const saveSettings = async (s: AppSettings) => {
     const res = await fetch('/api/settings', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(s) });
     if (res.ok) { setSettings(s); toast('Settings saved'); } else toast('Failed', 'error');
@@ -107,7 +113,8 @@ export default function Home() {
         )}
         {view === 'settings' && (
           <SettingsPanel settings={settings} members={members} onSaveSettings={saveSettings}
-            onAddMember={addMember} onDeleteMember={deleteMember} onTestNotify={() => notifyTelegram()} />
+            onAddMember={addMember} onDeleteMember={deleteMember} onUpdateMember={updateMember}
+            onTestNotify={() => notifyTelegram()} />
         )}
       </main>
 
